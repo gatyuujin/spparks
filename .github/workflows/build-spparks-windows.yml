@@ -1,0 +1,47 @@
+
+name: Build SPPARKS for Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout SPPARKS
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            make
+            mingw-w64-ucrt-x86_64-gcc
+
+      - name: Build SPPARKS
+        run: |
+          cd src
+          make serial
+          test -f spk_serial.exe
+
+      - name: Package files
+        run: |
+          mkdir -p release
+          cp src/spk_serial.exe release/
+          for dll in libstdc++-6.dll libgcc_s_seh-1.dll libwinpthread-1.dll; do
+            if [ -f "/ucrt64/bin/$dll" ]; then
+              cp "/ucrt64/bin/$dll" release/
+            fi
+          done
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: spparks-windows
+          path: release/*
