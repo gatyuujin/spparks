@@ -27,11 +27,13 @@ jobs:
 
       
      
+    
       - name: Build SPPARKS
         run: |
           cd src
           sed -i 's/-O -std=c++17/-O -std=c++17 -DM_PI=3.14159265358979323846/' MAKE/Makefile.serial
           sed -i 's/mkdir(arg\[i\], S_IRWXU | S_IRGRP | S_IXGRP);/mkdir(arg[i]);/' shell.cpp
+          sed -i 's/^SIZE[[:space:]]*=.*/SIZE = true/' MAKE/Makefile.serial
           make serial
           test -f spk_serial.exe
 
