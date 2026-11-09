@@ -24,11 +24,14 @@ jobs:
             make
             mingw-w64-ucrt-x86_64-gcc
 
+
       - name: Build SPPARKS
         run: |
           cd src
+          sed -i 's/-O -std=c++17/-O -std=c++17 -DM_PI=3.14159265358979323846/' MAKE/Makefile.serial
           make serial
           test -f spk_serial.exe
+
 
       - name: Package files
         run: |
